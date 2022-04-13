@@ -14,17 +14,25 @@ const client = new MeiliSearch({
   }
 })
 
+const INDEX = 'movies';
+
 export default function Home() {
   const [movies, setMovies] = useState([]);
   const [search, setSearch] = useState('');
-
+  
   useEffect(() => {
-    client
-      .index("movies")
-      .search(search)
-      .then((results) => {
-        setMovies(results.hits);
-      });
+    const checkHealthy = async () => {
+      const status = await client.isHealthy()
+      if (status) {
+        client
+          .index(INDEX)
+          .search(search)
+          .then((results) => {
+            setMovies(results.hits);
+          });
+      }
+    };
+    checkHealthy();
   }, [search]);
 
   return (
